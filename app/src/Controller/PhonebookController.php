@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-
 use App\Model\PhonebookModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -103,5 +102,12 @@ class PhonebookController extends AbstractController
 
         return $this->json($responseMessage, Response::HTTP_OK);
     }
+
+    public function shareContactAction(): JsonResponse
+    {
+
+    }
+
+
 }
 
