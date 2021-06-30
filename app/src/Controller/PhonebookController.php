@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
  * @Route("/api/v1/phonebook")
@@ -21,9 +22,11 @@ class PhonebookController extends AbstractController
      */
     public function createNerContactAction(Request $request, PhonebookModel $phonebookModel): JsonResponse
     {
-        $savedContact = $phonebookModel->addNewContact($request->toArray());
+        $savedContact = $phonebookModel->addNewContact($request->toArray(), $this->getUser());
 
-        return $this->json($savedContact, Response::HTTP_CREATED);
+        return $this->json($savedContact, Response::HTTP_CREATED, [], [
+            ObjectNormalizer::IGNORED_ATTRIBUTES => ["owner"]
+        ]);
     }
 
     /**
@@ -31,9 +34,19 @@ class PhonebookController extends AbstractController
      */
     public function getAllContactsAction(PhonebookModel $phonebookModel): JsonResponse
     {
-        $userContacts = $phonebookModel->getAllContacts();
+        $userContacts = $phonebookModel->getAllContacts($this->getUser());
 
-        return $this->json($userContacts, Response::HTTP_OK);
+        if (!$userContacts) {
+            $responseMessage = [
+                'error' => 'You do not have any contacts'
+            ];
+
+            return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
+        }
+
+        return $this->json($userContacts, Response::HTTP_OK, [], [
+            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner']
+        ]);
     }
 
     /**
@@ -41,9 +54,19 @@ class PhonebookController extends AbstractController
      */
     public function getOneContactAction($id, PhonebookModel $phonebookModel): JsonResponse
     {
-        $userContact = $phonebookModel->getOneContact($id);
+        $userContact = $phonebookModel->getOneContact($id, $this->getUser());
 
-        return $this->json($userContact, Response::HTTP_OK);
+        if(!$userContact) {
+            $responseMessage = [
+                'error' => sprintf("Contact Id No. %s non exist or does not belong to you", $id)
+            ];
+
+            return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
+        }
+
+        return $this->json($userContact, Response::HTTP_OK, [], [
+            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner']
+        ]);
     }
 
     /**
@@ -51,9 +74,19 @@ class PhonebookController extends AbstractController
      */
     public function updateContactAction($id, Request $request, PhonebookModel $phonebookModel): JsonResponse
     {
-        $updatedContact = $phonebookModel->updateContact($request->toArray(), $id);
+        $updatedContact = $phonebookModel->updateContact($request->toArray(), $id, $this->getUser());
 
-        return $this->json($updatedContact, Response::HTTP_CREATED);
+        if(!$updatedContact) {
+            $responseMessage = [
+                'error' => sprintf("Contact Id No. %s non exist or does not belong to you", $id)
+            ];
+
+            return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
+        }
+
+        return $this->json($updatedContact, Response::HTTP_CREATED, [], [
+            ObjectNormalizer::IGNORED_ATTRIBUTES  => ['owner']
+        ]);
     }
 
     /**
@@ -61,8 +94,8 @@ class PhonebookController extends AbstractController
      */
     public function deleteContactAction($id, PhonebookModel $phonebookModel): JsonResponse
     {
-        $responseFromModel = $phonebookModel->deleteContact($id);
-        if($responseFromModel === false) {
+        $responseFromModel = $phonebookModel->deleteContact($id, $this->getUser());
+        if ($responseFromModel === false) {
             $responseMessage = sprintf("Selected contact Id No. %s is not valid", $id);
             return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
         }

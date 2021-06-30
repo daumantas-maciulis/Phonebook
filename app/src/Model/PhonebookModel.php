@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Entity\Phonebook;
+use App\Entity\User;
 use App\Repository\PhonebookRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class PhonebookModel
 {
@@ -13,7 +15,8 @@ class PhonebookModel
         private EntityManagerInterface $entityManager,
         private PhonebookRepository $phonebookRepository
     )
-    {}
+    {
+    }
 
     private function saveData(Phonebook $newContact): void
     {
@@ -27,10 +30,12 @@ class PhonebookModel
         $this->entityManager->flush();
     }
 
-    public function addNewContact(array $contactFromRequest): Phonebook
+    public function addNewContact(array $contactFromRequest, UserInterface $user): Phonebook
     {
         $newContact = new Phonebook();
 
+        /** @var User $user */
+        $newContact->setOwner($user);
         $newContact->setName($contactFromRequest['name']);
         $newContact->setPhoneNumber($contactFromRequest['phoneNumber']);
 
@@ -39,29 +44,36 @@ class PhonebookModel
         return $newContact;
     }
 
-    public function getAllContacts(): array
+    public function getAllContacts(UserInterface $user): array|null
     {
-
-        return $this->phonebookRepository->findAll();
+        $userContacts = $this->phonebookRepository->findBy(['owner' => $user]);
+        if (!$userContacts) {
+            return null;
+        }
+        return $userContacts;
     }
 
-    public function getOneContact(string $id): Phonebook|null
+    public function getOneContact(string $id, UserInterface $user): Phonebook|null
     {
-        $contact = $this->phonebookRepository->find($id);
-        if($contact) {
+        $contact = $this->phonebookRepository->findOneBy(['id' => $id, 'owner' => $user]);
+        if ($contact) {
             return $contact;
         }
         return null;
     }
 
-    public function updateContact(array $contactInformation, string $id): Phonebook
+    public function updateContact(array $contactInformation, string $id, UserInterface $user): Phonebook|null
     {
-        $contact = $this->getOneContact($id);
+        $contact = $this->getOneContact($id, $user);
+
+        if(!$contact) {
+            return null;
+        }
 
         if ($contactInformation['phoneNumber']) {
             $contact->setPhoneNumber($contactInformation['phoneNumber']);
         }
-        if($contactInformation['name']) {
+        if ($contactInformation['name']) {
             $contact->setName($contactInformation['name']);
         }
 
@@ -70,11 +82,11 @@ class PhonebookModel
         return $contact;
     }
 
-    public function deleteContact(string $id): bool
+    public function deleteContact(string $id, UserInterface $user): bool
     {
-        $contact = $this->phonebookRepository->find($id);
+        $contact = $this->phonebookRepository->findOneBy(['id' => $id, 'owner' => $user]);
 
-        if($contact != null) {
+        if ($contact != null) {
             $this->deleteData($contact);
             return true;
         }

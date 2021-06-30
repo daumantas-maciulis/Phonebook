@@ -27,6 +27,11 @@ class Phonebook
      */
     private $phoneNumber;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="contacts")
+     */
+    private $owner;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -52,6 +57,18 @@ class Phonebook
     public function setPhoneNumber(string $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }
