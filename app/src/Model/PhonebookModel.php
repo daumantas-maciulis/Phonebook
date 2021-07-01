@@ -5,6 +5,7 @@ namespace App\Model;
 
 use App\Entity\Phonebook;
 use App\Entity\User;
+use App\Exception\DatabaseException;
 use App\Repository\PhonebookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -20,8 +21,8 @@ class PhonebookModel
 
     private function saveData(Phonebook $newContact): void
     {
-        $this->entityManager->persist($newContact);
-        $this->entityManager->flush();
+            $this->entityManager->persist($newContact);
+            $this->entityManager->flush();
     }
 
     private function deleteData(?Phonebook $contact): void
@@ -60,7 +61,7 @@ class PhonebookModel
         $sharedContacts = $this->phonebookRepository->findAll();
         foreach ($sharedContacts as $sharedContact) {
             $sharedWith = $sharedContact->getSharedWith()->contains($user);
-            if($sharedWith === true) {
+            if ($sharedWith === true) {
                 array_push($sharedContactsArray, $sharedContact);
             }
         }
