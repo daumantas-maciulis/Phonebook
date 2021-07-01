@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PhonebookRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -31,6 +33,16 @@ class Phonebook
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="contacts")
      */
     private $owner;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class)
+     */
+    private $sharedWith;
+
+    public function __construct()
+    {
+        $this->sharedWith = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -69,6 +81,30 @@ class Phonebook
     public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getSharedWith(): Collection
+    {
+        return $this->sharedWith;
+    }
+
+    public function addSharedWith(User $sharedWith): self
+    {
+        if (!$this->sharedWith->contains($sharedWith)) {
+            $this->sharedWith[] = $sharedWith;
+        }
+
+        return $this;
+    }
+
+    public function removeSharedWith(User $sharedWith): self
+    {
+        $this->sharedWith->removeElement($sharedWith);
 
         return $this;
     }

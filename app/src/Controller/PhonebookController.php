@@ -24,7 +24,7 @@ class PhonebookController extends AbstractController
         $savedContact = $phonebookModel->addNewContact($request->toArray(), $this->getUser());
 
         return $this->json($savedContact, Response::HTTP_CREATED, [], [
-            ObjectNormalizer::IGNORED_ATTRIBUTES => ["owner"]
+            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
         ]);
     }
 
@@ -44,7 +44,7 @@ class PhonebookController extends AbstractController
         }
 
         return $this->json($userContacts, Response::HTTP_OK, [], [
-            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner']
+            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
         ]);
     }
 
@@ -57,14 +57,14 @@ class PhonebookController extends AbstractController
 
         if(!$userContact) {
             $responseMessage = [
-                'error' => sprintf("Contact Id No. %s non exist or does not belong to you", $id)
+                'error' => sprintf("Phonebook Id No. %s non exist or does not belong to you", $id)
             ];
 
             return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
         }
 
         return $this->json($userContact, Response::HTTP_OK, [], [
-            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner']
+            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
         ]);
     }
 
@@ -77,14 +77,14 @@ class PhonebookController extends AbstractController
 
         if(!$updatedContact) {
             $responseMessage = [
-                'error' => sprintf("Contact Id No. %s non exist or does not belong to you", $id)
+                'error' => sprintf("Phonebook Id No. %s non exist or does not belong to you", $id)
             ];
 
             return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
         }
 
         return $this->json($updatedContact, Response::HTTP_CREATED, [], [
-            ObjectNormalizer::IGNORED_ATTRIBUTES  => ['owner']
+            ObjectNormalizer::IGNORED_ATTRIBUTES  => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
         ]);
     }
 
@@ -102,12 +102,5 @@ class PhonebookController extends AbstractController
 
         return $this->json($responseMessage, Response::HTTP_OK);
     }
-
-    public function shareContactAction(): JsonResponse
-    {
-
-    }
-
-
 }
 

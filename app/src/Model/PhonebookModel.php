@@ -93,4 +93,14 @@ class PhonebookModel
         return false;
     }
 
+    public function addSharedContact(Phonebook $phonebook, UserInterface $userToShareWith): Phonebook
+    {
+        /** @var User $userToShareWith */
+        $phonebook->addSharedWith($userToShareWith);
+
+        $this->saveData($phonebook);
+
+        return $phonebook;
+    }
+
 }
