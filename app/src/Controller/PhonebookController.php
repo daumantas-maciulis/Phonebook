@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Phonebook;
 use App\Model\PhonebookModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,9 +24,7 @@ class PhonebookController extends AbstractController
     {
         $savedContact = $phonebookModel->addNewContact($request->toArray(), $this->getUser());
 
-        return $this->json($savedContact, Response::HTTP_CREATED, [], [
-            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
-        ]);
+        return $this->response($savedContact, Response::HTTP_CREATED);
     }
 
     /**
@@ -42,7 +41,7 @@ class PhonebookController extends AbstractController
                 'error' => 'You do not have any contacts'
             ];
 
-            return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
+            return $this->response($responseMessage, Response::HTTP_BAD_REQUEST);
         }
 
         $contacts = [
@@ -50,9 +49,7 @@ class PhonebookController extends AbstractController
             'Shared contacts' => $sharedContacts
         ];
 
-        return $this->json($contacts, Response::HTTP_OK, [], [
-            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
-        ]);
+        return $this->response($contacts, Response::HTTP_OK);
     }
 
     /**
@@ -67,12 +64,9 @@ class PhonebookController extends AbstractController
                 'error' => sprintf("Phonebook Id No. %s non exist or does not belong to you", $id)
             ];
 
-            return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
+            return $this->response($responseMessage, Response::HTTP_BAD_REQUEST);
         }
-
-        return $this->json($userContact, Response::HTTP_OK, [], [
-            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
-        ]);
+        return $this->response($userContact, Response::HTTP_OK);
     }
 
     /**
@@ -87,12 +81,9 @@ class PhonebookController extends AbstractController
                 'error' => sprintf("Phonebook Id No. %s non exist or does not belong to you", $id)
             ];
 
-            return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
+            return $this->response($responseMessage, Response::HTTP_BAD_REQUEST);
         }
-
-        return $this->json($updatedContact, Response::HTTP_CREATED, [], [
-            ObjectNormalizer::IGNORED_ATTRIBUTES  => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
-        ]);
+        return $this->response($updatedContact, Response::HTTP_CREATED);
     }
 
     /**
@@ -108,6 +99,13 @@ class PhonebookController extends AbstractController
         $responseMessage = sprintf("Your contact Id No. %s was successfully deleted", $id);
 
         return $this->json($responseMessage, Response::HTTP_OK);
+    }
+
+    private function response(array|Phonebook $responseMessage, int $responseCode): JsonResponse
+    {
+        return $this->json($responseMessage, $responseCode, [], [
+            ObjectNormalizer::IGNORED_ATTRIBUTES  => ['owner', 'roles', 'password', 'username', 'salt', 'contacts', '__initializer__', '__cloner__', '__isInitialized__']
+        ]);
     }
 }
 

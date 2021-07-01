@@ -27,12 +27,10 @@ class SharedContactsController extends AbstractController
         $responseFromService = $contactsService->shareContacts($userRequest, $this->getUser());
 
         if($responseFromService instanceof Phonebook) {
-            return $this->json($responseFromService, Response::HTTP_CREATED, [], [
-                ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
-            ]);
+            return $this->response($responseFromService, Response::HTTP_CREATED);
         }
 
-        return $this->json($responseFromService, Response::HTTP_BAD_REQUEST);
+        return $this->response($responseFromService, Response::HTTP_BAD_REQUEST);
     }
 
 
@@ -45,16 +43,21 @@ class SharedContactsController extends AbstractController
         $responseFromModel = $phonebookModel->removeSharedContact($userRequest, $this->getUser());
 
         if($responseFromModel instanceof Phonebook) {
-            return $this->json($responseFromModel, Response::HTTP_OK, [], [
-                ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
-            ]);
+            return $this->response($responseFromModel, Response::HTTP_OK);
         }
 
         $message = [
             'error' => 'This contact is not shared with user'
         ];
 
-        return $this->json($message, Response::HTTP_BAD_REQUEST);
+        return $this->response($message, Response::HTTP_BAD_REQUEST);
+    }
+
+    private function response(array|Phonebook $responseMessage, int $responseCode): JsonResponse
+    {
+        return $this->json($responseMessage, $responseCode, [], [
+            ObjectNormalizer::IGNORED_ATTRIBUTES  => ['owner', 'roles', 'password', 'username', 'salt', 'contacts', '__initializer__', '__cloner__', '__isInitialized__']
+        ]);
     }
 }
 
