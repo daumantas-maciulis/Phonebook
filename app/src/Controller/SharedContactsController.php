@@ -33,15 +33,28 @@ class SharedContactsController extends AbstractController
         }
 
         return $this->json($responseFromService, Response::HTTP_BAD_REQUEST);
+    }
 
-//        $responseFromService = $contactService->shareContact($userRequest, $this->getUser());
-//        if($responseFromService instanceof SharedContacts) {
-//
-//            return $this->json($responseFromService, Response::HTTP_BAD_REQUEST);
-//        }
-//
-//        return $this->json($responseFromService, Response::HTTP_CREATED, [], [
-//            ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner']
-//        ]);
+
+    /**
+     * @Route(methods="DELETE")
+     */
+    public function removeSharedContactAction(Request $request, PhonebookModel $phonebookModel): JsonResponse
+    {
+        $userRequest = $request->toArray();
+        $responseFromModel = $phonebookModel->removeSharedContact($userRequest, $this->getUser());
+
+        if($responseFromModel instanceof Phonebook) {
+            return $this->json($responseFromModel, Response::HTTP_OK, [], [
+                ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
+            ]);
+        }
+
+        $message = [
+            'error' => 'This contact is not shared with user'
+        ];
+
+        return $this->json($message, Response::HTTP_BAD_REQUEST);
     }
 }
+

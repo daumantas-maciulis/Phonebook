@@ -35,6 +35,8 @@ class PhonebookController extends AbstractController
     {
         $userContacts = $phonebookModel->getAllContacts($this->getUser());
 
+        $sharedContacts = $phonebookModel->getAllSharedContacts($this->getUser());
+
         if (!$userContacts) {
             $responseMessage = [
                 'error' => 'You do not have any contacts'
@@ -43,7 +45,12 @@ class PhonebookController extends AbstractController
             return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json($userContacts, Response::HTTP_OK, [], [
+        $contacts = [
+            'Your contacts' => $userContacts,
+            'Shared contacts' => $sharedContacts
+        ];
+
+        return $this->json($contacts, Response::HTTP_OK, [], [
             ObjectNormalizer::IGNORED_ATTRIBUTES => ['owner', 'roles', 'password', 'username', 'salt', 'contacts']
         ]);
     }

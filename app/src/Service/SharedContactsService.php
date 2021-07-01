@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Entity\Phonebook;
 use App\Model\PhonebookModel;
 use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -35,8 +36,4 @@ class SharedContactsService
         return $this->phonebookModel->addSharedContact($contact, $userToShareWith);
     }
 
-    public function removeSharedContact(array $userRequest, UserInterface $user)
-    {
-        
-    }
 }

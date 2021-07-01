@@ -53,6 +53,20 @@ class PhonebookModel
         return $userContacts;
     }
 
+    public function getAllSharedContacts(UserInterface $user): array
+    {
+        $sharedContactsArray = [];
+        /** @var User $user */
+        $sharedContacts = $this->phonebookRepository->findAll();
+        foreach ($sharedContacts as $sharedContact) {
+            $sharedWith = $sharedContact->getSharedWith()->contains($user);
+            if($sharedWith === true) {
+                array_push($sharedContactsArray, $sharedContact);
+            }
+        }
+        return $sharedContactsArray;
+    }
+
     public function getOneContact(string $id, UserInterface $user): Phonebook|null
     {
         $contact = $this->phonebookRepository->findOneBy(['id' => $id, 'owner' => $user]);
@@ -66,7 +80,7 @@ class PhonebookModel
     {
         $contact = $this->getOneContact($id, $user);
 
-        if(!$contact) {
+        if (!$contact) {
             return null;
         }
 
@@ -101,6 +115,28 @@ class PhonebookModel
         $this->saveData($phonebook);
 
         return $phonebook;
+    }
+
+    public function removeSharedContact(array $userRequest, UserInterface $user): Phonebook|null
+    {
+        $sharedContact = $this->getOneContact($userRequest['contactId'], $user);
+        if (!$sharedContact) {
+            return null;
+        }
+
+        $contactsSharedWith = $sharedContact->getSharedWith()->toArray();
+
+        foreach ($contactsSharedWith as $sharedWith) {
+            /** @var User $sharedWith */
+            if ($sharedWith->getEmail() === $userRequest['shareWith']) {
+                $sharedContact->removeSharedWith($sharedWith);
+
+                $this->saveData($sharedContact);
+
+                return $sharedContact;
+            }
+        }
+        return null;
     }
 
 }
