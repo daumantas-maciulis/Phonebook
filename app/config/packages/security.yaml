@@ -11,6 +11,11 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
+        register:
+            pattern: ^/api/v1/create-account
+            stateless: true
+            anonymous: true
+
         login:
             pattern: ^/api/login
             stateless: true
@@ -47,4 +52,5 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
          - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+         - { path: ^/api/v1/create-account, roles: IS_AUTHENTICATED_ANONYMOUSLY }
          - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
