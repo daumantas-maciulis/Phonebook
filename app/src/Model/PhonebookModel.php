@@ -21,8 +21,8 @@ class PhonebookModel
 
     private function saveData(Phonebook $newContact): void
     {
-            $this->entityManager->persist($newContact);
-            $this->entityManager->flush();
+        $this->entityManager->persist($newContact);
+        $this->entityManager->flush();
     }
 
     private function deleteData(?Phonebook $contact): void
@@ -31,14 +31,24 @@ class PhonebookModel
         $this->entityManager->flush();
     }
 
-    public function addNewContact(array $contactFromRequest, UserInterface $user): Phonebook
+    public function addNewContact(\stdClass $contactFromRequest, UserInterface $user): Phonebook
     {
         $newContact = new Phonebook();
 
         /** @var User $user */
         $newContact->setOwner($user);
-        $newContact->setName($contactFromRequest['name']);
-        $newContact->setPhoneNumber($contactFromRequest['phoneNumber']);
+        $newContact->setName($contactFromRequest->name);
+        $newContact->setPhoneNumber($contactFromRequest->lastName);
+        if (isset($contactFromRequest->lastName)) {
+            $newContact->setLastName($contactFromRequest->phoneNumber);
+        }
+        if (isset($contactFromRequest->city)) {
+            $newContact->setCity($contactFromRequest->city);
+        }
+        if (isset($contactFromRequest->adress)) {
+            $newContact->setAdress($contactFromRequest->adress);
+        }
+
 
         $this->saveData($newContact);
 
@@ -77,19 +87,27 @@ class PhonebookModel
         return null;
     }
 
-    public function updateContact(array $contactInformation, string $id, UserInterface $user): Phonebook|null
+    public function updateContact(\stdClass $contactInformation, string $id, UserInterface $user): Phonebook|null
     {
         $contact = $this->getOneContact($id, $user);
 
         if (!$contact) {
             return null;
         }
-
-        if ($contactInformation['phoneNumber']) {
-            $contact->setPhoneNumber($contactInformation['phoneNumber']);
+        if (isset($contactInformation->name)) {
+            $contact->setName($contactInformation->name);
         }
-        if ($contactInformation['name']) {
-            $contact->setName($contactInformation['name']);
+        if (isset($contactInformation->phoneNumber)) {
+            $contact->setPhoneNumber($contactInformation->phoneNumber);
+        }
+        if (isset($contactInformation->lastName)) {
+            $contact->setLastName($contactInformation->lastName);
+        }
+        if (isset($contactInformation->city)) {
+            $contact->setCity($contactInformation->city);
+        }
+        if (isset($contactInformation->adress)) {
+            $contact->setAdress($contactInformation->adress);
         }
 
         $this->saveData($contact);
@@ -108,7 +126,8 @@ class PhonebookModel
         return false;
     }
 
-    public function addSharedContact(Phonebook $phonebook, UserInterface $userToShareWith): Phonebook
+    public
+    function addSharedContact(Phonebook $phonebook, UserInterface $userToShareWith): Phonebook
     {
         /** @var User $userToShareWith */
         $phonebook->addSharedWith($userToShareWith);
@@ -118,7 +137,8 @@ class PhonebookModel
         return $phonebook;
     }
 
-    public function removeSharedContact(array $userRequest, UserInterface $user): Phonebook|null
+    public
+    function removeSharedContact(array $userRequest, UserInterface $user): Phonebook|null
     {
         $sharedContact = $this->getOneContact($userRequest['contactId'], $user);
         if (!$sharedContact) {
@@ -140,10 +160,11 @@ class PhonebookModel
         return null;
     }
 
-    public function findContactByName(array $userInput, UserInterface $user): array|null
+    public
+    function findContactByName(array $userInput, UserInterface $user): array|null
     {
         $contact = $this->phonebookRepository->findBy(['name' => $userInput['name'], 'owner' => $user]);
-        if(!$contact) {
+        if (!$contact) {
             return null;
         }
 

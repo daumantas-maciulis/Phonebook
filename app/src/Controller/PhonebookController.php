@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Client\AccuWeather\Client;
 use App\Entity\Phonebook;
+use App\Model\CityWeatherModel;
 use App\Model\PhonebookModel;
+use App\Service\CityWeatherService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,11 +23,19 @@ class PhonebookController extends AbstractController
     /**
      * @Route(methods="POST")
      */
-    public function createNerContactAction(Request $request, PhonebookModel $phonebookModel): JsonResponse
+    public function createNerContactAction(Request $request, PhonebookModel $phonebookModel, CityWeatherModel $cityWeatherModel): JsonResponse
     {
-        $savedContact = $phonebookModel->addNewContact($request->toArray(), $this->getUser());
+        $userRequest = json_decode(json_encode($request->toArray()));
+
+            dump($userRequest->city);
+        $savedContact = $phonebookModel->addNewContact($userRequest, $this->getUser());
+        if(isset($userRequest->city)) {
+            $cityWeatherModel->addNewCity($userRequest->city);
+        }
 
         return $this->response($savedContact, Response::HTTP_CREATED);
+
+
     }
 
     /**
@@ -74,7 +85,9 @@ class PhonebookController extends AbstractController
      */
     public function updateContactAction($id, Request $request, PhonebookModel $phonebookModel): JsonResponse
     {
-        $updatedContact = $phonebookModel->updateContact($request->toArray(), $id, $this->getUser());
+        $userRequest = json_decode(json_encode($request->toArray()));
+
+        $updatedContact = $phonebookModel->updateContact($userRequest, $id, $this->getUser());
 
         if(!$updatedContact) {
             $responseMessage = [

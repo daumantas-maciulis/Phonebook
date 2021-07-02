@@ -25,6 +25,11 @@ class Phonebook
     private $name;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $lastName;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $phoneNumber;
@@ -35,9 +40,21 @@ class Phonebook
     private $owner;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $city;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $adress;
+
+    /**
      * @ORM\ManyToMany(targetEntity=User::class)
      */
     private $sharedWith;
+
+
 
     public function __construct()
     {
@@ -107,5 +124,36 @@ class Phonebook
         $this->sharedWith->removeElement($sharedWith);
 
         return $this;
+    }
+
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName($lastName): void
+    {
+        $this->lastName = $lastName;
+    }
+
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+
+    public function setCity($city): void
+    {
+        $this->city = $city;
+    }
+
+    public function getAdress()
+    {
+        return $this->adress;
+    }
+
+    public function setAdress($adress): void
+    {
+        $this->adress = $adress;
     }
 }

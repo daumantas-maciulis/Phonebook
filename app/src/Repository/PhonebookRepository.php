@@ -18,6 +18,5 @@ class PhonebookRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Phonebook::class);
     }
-
-
 }
+
