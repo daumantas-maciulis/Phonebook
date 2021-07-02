@@ -25,23 +25,40 @@ class CityWeatherModel
 
     public function addNewCityCode(string $city, string $cityCode): void
     {
-        $newCityCode = new CityWeather();
+        $cityFromDb = $this->cityWeatherRepository->findOneBy(['city' => $city]);
+        dump($cityFromDb);
+        if (!$cityFromDb) {
+            $newCityCode = new CityWeather();
 
-        $newCityCode->setCity($city);
-        $newCityCode->setCityCode($cityCode);
+            $newCityCode->setCity($city);
+            $newCityCode->setCityCode($cityCode);
 
-        $this->saveData($newCityCode);
+            $this->saveData($newCityCode);
+        }
+
+        $cityFromDb->setCity($city);
+        $cityFromDb->setCityCode($cityCode);
+
+        $this->saveData($cityFromDb);
     }
 
     public function addNewCity(string $city): void
     {
         $cityFromDb = $this->cityWeatherRepository->findOneBy(['city' => $city]);
-        if(!$cityFromDb) {
+        if (!$cityFromDb) {
             $newCity = new CityWeather();
             /** @var string $city */
             $newCity->setCity($city);
-        }
         $this->saveData($newCity);
+        }
+    }
+
+    public function setTodaysTemp(array $cityWeather, CityWeather $city)
+    {
+        $city->setMinimumTemperature($cityWeather['Minimum']);
+        $city->setMaximumTemperature($cityWeather['Maximum']);
+
+        $this->saveData($city);
     }
 
 

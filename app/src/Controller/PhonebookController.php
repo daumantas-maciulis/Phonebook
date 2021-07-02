@@ -23,15 +23,16 @@ class PhonebookController extends AbstractController
     /**
      * @Route(methods="POST")
      */
-    public function createNerContactAction(Request $request, PhonebookModel $phonebookModel, CityWeatherModel $cityWeatherModel): JsonResponse
+    public function createNerContactAction(Request $request, PhonebookModel $phonebookModel, CityWeatherModel $cityWeatherModel,CityWeatherService $service): JsonResponse
     {
+
         $userRequest = json_decode(json_encode($request->toArray()));
 
-            dump($userRequest->city);
         $savedContact = $phonebookModel->addNewContact($userRequest, $this->getUser());
         if(isset($userRequest->city)) {
             $cityWeatherModel->addNewCity($userRequest->city);
         }
+        $service->addTodaysWehater();
 
         return $this->response($savedContact, Response::HTTP_CREATED);
 

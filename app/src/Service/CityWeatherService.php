@@ -5,22 +5,44 @@ namespace App\Service;
 
 
 use App\Client\AccuWeather\Client;
+use App\Entity\CityWeather;
 use App\Model\CityWeatherModel;
+use App\Repository\CityWeatherRepository;
 
 class CityWeatherService
 {
     public function __construct(
         private Client $accuWeatherClient,
-        private CityWeatherModel $cityCodeModel
+        private CityWeatherModel $cityWeatherModel,
+        private CityWeatherRepository $cityWeatherRepository
     ){}
 
-    public function addCityCodeIfNotExist(string $city): void
+    public function addTodaysWehater(): void
     {
-        $cityKey = $this->accuWeatherClient->getCityCode($city);
-        $this->cityCodeModel->addNewCityCode($city, $cityKey);
+        $this->addCityCodeIfNotExist();
+
+        $cities = $this->cityWeatherRepository->findAll();
+        foreach ($cities as $city){
+            $cityWeather = $this->getTodaysWeather($city->getCityCode());
+            $this->cityWeatherModel->setTodaysTemp($cityWeather, $city);
+        }
+
+
+
     }
 
-    public function getTodaysWeather(string $cityCode)
+    private function addCityCodeIfNotExist(): void
+    {
+        $cities = $this->cityWeatherRepository->findAll();
+        foreach ($cities as $city){
+            if($city->getCityCode() === null){
+                $cityKey = $this->accuWeatherClient->getCityCode($city->getCity());
+                $this->cityWeatherModel->addNewCityCode($city->getCity(), $cityKey);
+            }
+        }
+    }
+
+    private function getTodaysWeather(string $cityCode)
     {
         return $this->accuWeatherClient->getCityWeather('231459');
     }
