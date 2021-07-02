@@ -5,7 +5,6 @@ namespace App\Service;
 
 
 use App\Client\AccuWeather\Client;
-use App\Entity\CityWeather;
 use App\Model\CityWeatherModel;
 use App\Repository\CityWeatherRepository;
 
@@ -26,9 +25,6 @@ class CityWeatherService
             $cityWeather = $this->getTodaysWeather($city->getCityCode());
             $this->cityWeatherModel->setTodaysTemp($cityWeather, $city);
         }
-
-
-
     }
 
     private function addCityCodeIfNotExist(): void
@@ -44,9 +40,6 @@ class CityWeatherService
 
     private function getTodaysWeather(string $cityCode)
     {
-        return $this->accuWeatherClient->getCityWeather('231459');
+        return $this->accuWeatherClient->getCityWeather($cityCode);
     }
-
-
-
 }
