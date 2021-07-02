@@ -140,4 +140,14 @@ class PhonebookModel
         return null;
     }
 
+    public function findContactByName(array $userInput, UserInterface $user): array|null
+    {
+        $contact = $this->phonebookRepository->findBy(['name' => $userInput['name'], 'owner' => $user]);
+        if(!$contact) {
+            return null;
+        }
+
+        return $contact;
+    }
+
 }

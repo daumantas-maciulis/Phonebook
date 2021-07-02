@@ -1,8 +1,7 @@
 <?php
-
+declare(strict_types=1);
 
 namespace App\Controller\Security;
-
 
 use App\Model\UserModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,8 +20,19 @@ class UserController extends AbstractController
      */
     public function createAccountAction(Request $request, UserModel $userModel): JsonResponse
     {
-        $userModel->createNewUser($request->toArray());
+        $userInput = $request->toArray();
+        $userExists = $userModel->checkIfExist($userInput['email']);
+        if ($userExists) {
+            $responseMessage = [
+                'error' => sprintf('User with email %s already exist', $userInput['email'])
+            ];
+
+            return $this->json($responseMessage, Response::HTTP_BAD_REQUEST);
+        }
+
+        $userModel->createNewUser($userInput);
 
         return $this->json("Registration completed", Response::HTTP_CREATED);
     }
 }
+

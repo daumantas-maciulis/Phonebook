@@ -101,6 +101,7 @@ class PhonebookController extends AbstractController
         return $this->json($responseMessage, Response::HTTP_OK);
     }
 
+
     private function response(array|Phonebook $responseMessage, int $responseCode): JsonResponse
     {
         return $this->json($responseMessage, $responseCode, [], [
