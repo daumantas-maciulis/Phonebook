@@ -61,5 +61,25 @@ class CityWeatherModel
         $this->saveData($city);
     }
 
+    public function getCityTemperature(string $cityName): array|null
+    {
+        $city = $this->cityWeatherRepository->findOneBy(['city' => $cityName]);
+
+        $minTemp = $city->getMinimumTemperature();
+        $maxTemp = $city->getMaximumTemperature();
+
+        if($minTemp === null && $maxTemp === null) {
+            return null;
+        }
+
+        $resposeArray = [
+            'Minimum temp' => $minTemp,
+            'Maximum temp' => $maxTemp
+        ];
+
+        return $resposeArray;
+    }
+
+
 
 }

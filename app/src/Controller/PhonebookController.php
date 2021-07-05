@@ -8,6 +8,7 @@ use App\Entity\Phonebook;
 use App\Model\CityWeatherModel;
 use App\Model\PhonebookModel;
 use App\Service\CityWeatherService;
+use App\Service\ContactsWithWeatherService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,19 +33,18 @@ class PhonebookController extends AbstractController
         if(isset($userRequest->city)) {
             $cityWeatherModel->addNewCity($userRequest->city);
         }
-        $service->addTodaysWehater();
 
         return $this->response($savedContact, Response::HTTP_CREATED);
-
-
     }
 
     /**
      * @Route(methods="GET")
      */
-    public function getAllContactsAction(PhonebookModel $phonebookModel): JsonResponse
+    public function getAllContactsAction(PhonebookModel $phonebookModel, ContactsWithWeatherService $service): JsonResponse
     {
         $userContacts = $phonebookModel->getAllContacts($this->getUser());
+
+        $userContactsWithWeather = $service->returnContactsWithWeather($this->getUser());
 
         $sharedContacts = $phonebookModel->getAllSharedContacts($this->getUser());
 
@@ -57,7 +57,7 @@ class PhonebookController extends AbstractController
         }
 
         $contacts = [
-            'Your contacts' => $userContacts,
+            'Your contacts' => $userContactsWithWeather,
             'Shared contacts' => $sharedContacts
         ];
 

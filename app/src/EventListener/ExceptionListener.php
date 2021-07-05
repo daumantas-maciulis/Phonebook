@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Exception\BadCityException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -22,6 +23,7 @@ class ExceptionListener
     {
         if ($exception instanceof NotFoundHttpException) {
             return $this->handleNotFoundHttpException();
+
         } else {
             $response = [
                 'message' => 'Internal server error',
@@ -40,6 +42,7 @@ class ExceptionListener
 
         return new JsonResponse($response, Response::HTTP_NOT_FOUND);
     }
+
 
 }
 

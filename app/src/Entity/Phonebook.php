@@ -54,6 +54,11 @@ class Phonebook
      */
     private $sharedWith;
 
+//    /**
+//     * @ORM\ManyToOne(targetEntity=CityWeather::class)
+//     */
+//    private $city;
+
 
 
     public function __construct()
