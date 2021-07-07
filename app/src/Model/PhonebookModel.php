@@ -37,8 +37,8 @@ class PhonebookModel
         /** @var User $user */
         $newContact->setOwner($user);
         $newContact->setName($contactFromRequest->name);
-        $newContact->setPhoneNumber($contactFromRequest->lastName);
-        if (isset($contactFromRequest->lastName)) {
+        $newContact->setPhoneNumber($contactFromRequest->phoneNumber);
+        if (isset($contactFromRequest->phoneNumber)) {
             $newContact->setLastName($contactFromRequest->phoneNumber);
         }
         if (isset($contactFromRequest->city)) {
