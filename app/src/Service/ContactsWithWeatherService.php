@@ -7,8 +7,6 @@ namespace App\Service;
 use App\Entity\Phonebook;
 use App\Model\CityWeatherModel;
 use App\Model\PhonebookModel;
-use App\Repository\CityWeatherRepository;
-use App\Repository\PhonebookRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class ContactsWithWeatherService

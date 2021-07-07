@@ -1,9 +1,8 @@
 <?php
-
+declare(strict_types=1);
 
 namespace App\Client\AccuWeather;
 
-use App\Exception\BadCityException;
 use \GuzzleHttp\Client as Guzzle;
 
 class Client

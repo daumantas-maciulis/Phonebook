@@ -14,23 +14,22 @@ class SharedContactsService
         private PhonebookModel $phonebookModel,
         private UserRepository $userRepository
     )
-    {}
+    {
+    }
 
     public function shareContacts(array $userRequest, UserInterface $user)
     {
         $contact = $this->phonebookModel->getOneContact($userRequest['contactId'], $user);
-        if(!$contact) {
-            $response = [
+        if (!$contact) {
+            return [
                 'error' => sprintf("Phonebook Id No. %s non exist or does not belong to you", $userRequest['contactId'])
             ];
-            return $response;
         }
         $userToShareWith = $this->userRepository->findOneBy(['email' => $userRequest['shareWith']]);
-        if(!$userToShareWith) {
-            $response = [
+        if (!$userToShareWith) {
+            return [
                 'error' => sprintf("User %s non exist.", $userRequest['shareWith'])
             ];
-            return $response;
         }
 
         return $this->phonebookModel->addSharedContact($contact, $userToShareWith);

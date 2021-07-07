@@ -5,7 +5,6 @@ namespace App\Model;
 
 use App\Entity\Phonebook;
 use App\Entity\User;
-use App\Exception\DatabaseException;
 use App\Repository\PhonebookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -126,8 +125,7 @@ class PhonebookModel
         return false;
     }
 
-    public
-    function addSharedContact(Phonebook $phonebook, UserInterface $userToShareWith): Phonebook
+    public function addSharedContact(Phonebook $phonebook, UserInterface $userToShareWith): Phonebook
     {
         /** @var User $userToShareWith */
         $phonebook->addSharedWith($userToShareWith);
@@ -137,8 +135,7 @@ class PhonebookModel
         return $phonebook;
     }
 
-    public
-    function removeSharedContact(array $userRequest, UserInterface $user): Phonebook|null
+    public function removeSharedContact(array $userRequest, UserInterface $user): Phonebook|null
     {
         $sharedContact = $this->getOneContact($userRequest['contactId'], $user);
         if (!$sharedContact) {
@@ -160,8 +157,7 @@ class PhonebookModel
         return null;
     }
 
-    public
-    function findContactByName(array $userInput, UserInterface $user): array|null
+    public function findContactByName(array $userInput, UserInterface $user): array|null
     {
         $contact = $this->phonebookRepository->findBy(['name' => $userInput['name'], 'owner' => $user]);
         if (!$contact) {

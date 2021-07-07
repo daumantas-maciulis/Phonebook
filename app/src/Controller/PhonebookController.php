@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Client\AccuWeather\Client;
 use App\Entity\Phonebook;
 use App\Model\CityWeatherModel;
 use App\Model\PhonebookModel;
@@ -24,7 +23,7 @@ class PhonebookController extends AbstractController
     /**
      * @Route(methods="POST")
      */
-    public function createNerContactAction(Request $request, PhonebookModel $phonebookModel, CityWeatherModel $cityWeatherModel,CityWeatherService $service): JsonResponse
+    public function createNewContactAction(Request $request, PhonebookModel $phonebookModel, CityWeatherModel $cityWeatherModel): JsonResponse
     {
 
         $userRequest = json_decode(json_encode($request->toArray()));
